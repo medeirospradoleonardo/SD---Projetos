@@ -32,9 +32,30 @@ public class TestarSpencil {
 
     }
 
+    public static PontoRGB[][] colocarPontoFixo(PontoRGB[][] m, ArrayList<String> pontos){
+        int x = 0;
+        int y = 0;
+        int r = 0;
+        int b = 0;
+        int g = 0;
+        for(String p : pontos){
+            x = Integer.parseInt(p.split(" ")[0]);
+            y = Integer.parseInt(p.split(" ")[1]);
+            r = Integer.parseInt(p.split(" ")[2]);
+            g = Integer.parseInt(p.split(" ")[3]);
+            b = Integer.parseInt(p.split(" ")[4]);
+
+            m[x][y] = new PontoRGB(r, g, b);
+        }
+
+        return m;
+    }
+
     public static void main(String[] args) throws IOException {
 
-        Scanner in = new Scanner(new FileReader("dados.txt"));
+        // Scanner in = new Scanner(new FileReader("dados.txt"));
+        Scanner in = new Scanner(new FileReader("img01.dat"));
+        int n_iteracoes = 10000;
         int n_matriz = 0;
         int n_ponto_fixos = 0;
         int qtd = 0;
@@ -54,8 +75,7 @@ public class TestarSpencil {
             qtd += 1;
         }
 
-        System.out.println(pontos.size());
-
+        // Criando a matriz
         PontoRGB m[][] = new PontoRGB[n_matriz][n_matriz];
         for (int i = 0; i < m.length; i++) {
             for (int j = 0; j < m[0].length; j++) {
@@ -67,7 +87,13 @@ public class TestarSpencil {
             }
         }
 
-        File arquivo = new File("teste.txt");
+        // Fazendo as iterações
+        for(int i=0; i<n_iteracoes; i++){
+            m = colocarPontoFixo(m, pontos);
+            m = calcularMatriz(m);
+        }
+
+        File arquivo = new File("final.dat");
 
         // cria um arquivo (vazio)
         arquivo.createNewFile();
