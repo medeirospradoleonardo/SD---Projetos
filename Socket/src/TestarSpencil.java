@@ -87,11 +87,19 @@ public class TestarSpencil {
             }
         }
 
+        long tempoInicial = System.currentTimeMillis();
+
         // Fazendo as iterações
         for(int i=0; i<n_iteracoes; i++){
             m = colocarPontoFixo(m, pontos);
             m = calcularMatriz(m);
         }
+
+        long tempoFinal = System.currentTimeMillis();
+        long tempoExecucao = tempoFinal - tempoInicial;
+
+        System.out.println("O método foi executado em " + (tempoExecucao) + " milisegundos");
+        System.out.println("O método foi executado em " + (tempoExecucao/1000) + " segundos");
 
         File arquivo = new File("final.dat");
 
@@ -107,6 +115,7 @@ public class TestarSpencil {
         // construtor recebe como argumento o objeto do tipo FileWriter
         BufferedWriter bw = new BufferedWriter(fw);
 
+        // Colocando a matriz no arquivo considerando as bordas
         for (int i = 0; i < m.length; i++) {
             for (int j = 0; j < m[0].length; j++) {
                 bw.write("< " + m[i][j].getValorR() + ", " + m[i][j].getValorG() + ", " + m[i][j].getValorB() + " >");
@@ -116,6 +125,17 @@ public class TestarSpencil {
             }
             bw.newLine();
         }
+
+        // // Colocando a matriz no arquivo não considerando as bordas
+        // for (int i = 1; i < m.length-1; i++) {
+        //     for (int j = 1; j < m[0].length-1; j++) {
+        //         bw.write("< " + m[i][j].getValorR() + ", " + m[i][j].getValorG() + ", " + m[i][j].getValorB() + " >");
+        //         if (j != m[0].length - 1) {
+        //             bw.write(" ");
+        //         }
+        //     }
+        //     bw.newLine();
+        // }
 
         // fecha os recursos
         bw.close();
