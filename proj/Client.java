@@ -6,8 +6,6 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import javax.swing.JOptionPane;
-
 public class Client {
 
     private static final String SERVER_IP = "127.0.0.1";
@@ -20,6 +18,9 @@ public class Client {
         // InputStreamReader(socket.getInputStream()));
         BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+        ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
+        ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 
         // while(true){
         // System.out.println("> ");
@@ -35,38 +36,41 @@ public class Client {
         // System.out.println("Server says: " + serverResponse2);
         // }
 
-        ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-        PontoRGB[][] matriz = (PontoRGB[][]) input.readObject();
-        
-        // int serverResponse = matriz[0][1].getValorR();
-        // System.out.println(serverResponse);
+        while (true) {
+            int[][] matriz = (int[][]) input.readObject();
 
-        ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-        output.writeObject(calcularMatriz(matriz));
-        output.flush();
+            // int serverResponse = matriz[0][1].getValorR();
+            // System.out.println(serverResponse);
 
-        socket.close();
-        System.exit(0);
+            output.writeObject(calcularMatriz(matriz));
+            output.flush();
+
+        }
+
+        // socket.close();
+        // System.exit(0);
     }
 
-    public static PontoRGB[][] calcularMatriz(PontoRGB[][] m) {
-        int colunas = m[0].length;
+    public static int[][] calcularMatriz(int[][] m) {
         int linhas = m.length;
-        PontoRGB r[][] = new PontoRGB[linhas - 2][colunas - 2];
+        int colunas = m[0].length;
+        int m_r[][] = new int[linhas - 2][colunas - 6];
         for (int i = 1; i < linhas - 1; i++) {
-            for (int j = 1; j < colunas - 1; j++) {
-                int R = (m[i][j].getValorR() + m[i - 1][j].getValorR() + m[i + 1][j].getValorR()
-                        + m[i][j - 1].getValorR() + m[i][j + 1].getValorR()) / 5;
-                int G = (m[i][j].getValorG() + m[i - 1][j].getValorG() + m[i + 1][j].getValorG()
-                        + m[i][j - 1].getValorG() + m[i][j + 1].getValorG()) / 5;
-                int B = (m[i][j].getValorB() + m[i - 1][j].getValorB() + m[i + 1][j].getValorB()
-                        + m[i][j - 1].getValorB() + m[i][j + 1].getValorB()) / 5;
-                r[i-1][j-1] = new PontoRGB(R, G, B);
+            for (int j = 1; j < colunas / 3 - 1; j++) {
+                int r = (m[i][(3 * j)] + m[i - 1][(3 * j)] + m[i + 1][(3 * j)]
+                        + m[i][(3 * (j - 1))] + m[i][(3 * (j + 1))]) / 5;
+                int g = (m[i][(3 * j) + 1] + m[i - 1][(3 * j) + 1] + m[i + 1][(3 * j) + 1]
+                        + m[i][(3 * (j - 1)) + 1] + m[i][(3 * (j + 1)) + 1]) / 5;
+                int b = (m[i][(3 * j) + 2] + m[i - 1][(3 * j) + 2] + m[i + 1][(3 * j) + 2]
+                        + m[i][(3 * (j - 1)) + 2] + m[i][(3 * (j + 1)) + 2]) / 5;
+                m_r[i - 1][(3 * (j - 1))] = r;
+                m_r[i - 1][(3 * (j - 1)) + 1] = g;
+                m_r[i - 1][(3 * (j - 1)) + 2] = b;
             }
 
         }
 
-        return r;
+        return m_r;
 
     }
 }

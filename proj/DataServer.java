@@ -5,24 +5,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DataServer {
 
-    private static int n_clients = 4;
-    private static int n_iteracoes = 1;
+    private static int n_clients = 2;
+    private static int n_iteracoes = 10000;
     private static int n_matriz = 256;
-    private static PontoRGB m[][];
-
-    private static String[] names = { "1", "2", "3", "4" };
-    private static String[] surnames = { "11", "22", "33", "44" };
 
     private static final int PORT = 9090;
 
@@ -51,13 +45,17 @@ public class DataServer {
         }
 
         // Criando a matriz
-        m = new PontoRGB[n_matriz][n_matriz];
+        int m[][] = new int[n_matriz][n_matriz*3];
         for (int i = 0; i < m.length; i++) {
-            for (int j = 0; j < m[0].length; j++) {
-                if ((i - 1 >= 0) && (i + 1 < m.length) && (j - 1 >= 0) && (j + 1 < m[0].length)) {
-                    m[i][j] = new PontoRGB(0, 0, 0);
+            for (int j = 0; j < n_matriz; j++) {
+                if ((i - 1 >= 0) && (i + 1 < m.length) && ((3*(j-1)) >= 0) && ((3*(j+1)) < m[0].length)) {
+                    m[i][(3*j)] = 0;
+                    m[i][(3*j)+1] = 0;
+                    m[i][(3*j)+2] = 0;
                 } else {
-                    m[i][j] = new PontoRGB(127, 127, 127);
+                    m[i][(3*j)] = 127;
+                    m[i][(3*j)+1] = 127;
+                    m[i][(3*j)+2] = 127;
                 }
             }
         }
@@ -78,7 +76,7 @@ public class DataServer {
             pool.execute(clientThread);
         }
         
-        ArrayList<PontoRGB[][]> partes_matriz = new ArrayList<>();
+        ArrayList<int[][]> partes_matriz = new ArrayList<>();
         // ObjectOutputStream output = new ObjectOutputStream(clientThread.getClient().getOutputStream());
         // ObjectInputStream input = new ObjectInputStream(clientThread.getClient().getInputStream());
 
@@ -116,15 +114,15 @@ public class DataServer {
                 // ObjectInputStream input = new ObjectInputStream(client.getClient().getInputStream());
 
 
-                PontoRGB[][] teste = (PontoRGB[][]) inputs.get(j).readObject();
+                int[][] teste = (int[][]) inputs.get(j).readObject();
                 partes_matriz.add(teste);
 
             }
 
-            System.out.println(partes_matriz.get(0).length);
-            System.out.println(partes_matriz.get(0)[0].length);
-            System.out.println(partes_matriz.get(1).length);
-            System.out.println(partes_matriz.get(1)[0].length);
+            // System.out.println(partes_matriz.get(0).length);
+            // System.out.println(partes_matriz.get(0)[0].length);
+            // System.out.println(partes_matriz.get(1).length);
+            // System.out.println(partes_matriz.get(1)[0].length);
 
             m = juntarMatrizes(partes_matriz);
 
@@ -171,9 +169,9 @@ public class DataServer {
 
         // Colocando a matriz no arquivo não considerando as bordas
         for (int i = 1; i < m.length-1; i++) {
-            for (int j = 1; j < m[0].length-1; j++) {
-                bw.write("< " + m[i][j].getValorR() + ", " + m[i][j].getValorG() + ", " + m[i][j].getValorB() + " >");
-                if (j != m[0].length - 1) {
+            for (int j = 1; j < m.length-1; j++) {
+                bw.write("< " + m[i][(3*j)] + ", " + m[i][(3*j)+1] + ", " + m[i][(3*j)+2] + " >");
+                if (j != m.length - 1) {
                     bw.write(" ");
                 }
             }
@@ -205,15 +203,17 @@ public class DataServer {
         return intervalos;
     }
 
-    public static PontoRGB[][] getParteMatriz(ClientHandler c, PontoRGB[][] m) {
+    public static int[][] getParteMatriz(ClientHandler c, int[][] m) {
         ArrayList<Integer> intervalos = getIntervalos(c);
         int n_linhas = Math.abs(intervalos.get(0) - intervalos.get(1)) + 1;
-        PontoRGB p_m[][] = new PontoRGB[n_linhas][n_matriz];
+        int p_m[][] = new int[n_linhas][n_matriz*3];
         int x = 0;
 
         for (int i = intervalos.get(0); i <= intervalos.get(1); i++) {
             for (int j = 0; j < n_matriz; j++) {
-                p_m[x][j] = new PontoRGB(m[i][j].getValorR(), m[i][j].getValorG(), m[i][j].getValorB());
+                p_m[x][(3*j)] = m[i][(3*j)];
+                p_m[x][(3*j)+1] = m[i][(3*j)+1];
+                p_m[x][(3*j)+2] = m[i][(3*j)+2];
             }
             x++;
         }
@@ -221,16 +221,16 @@ public class DataServer {
         return p_m;
     }
 
-    public static void printarMatriz(PontoRGB[][] m) {
+    public static void printarMatriz(int[][] m) {
         for (int i = 0; i < m.length; i++) {
-            for (int j = 0; j < m[0].length; j++) {
-                System.out.print(m[i][j].getValorR() + " " + m[i][j].getValorG() + " " + m[i][j].getValorB() + " ");
+            for (int j = 0; j < m.length; j++) {
+                System.out.print(m[i][(3*j)] + " " + m[i][(3*j)+1] + " " + m[i][(3*j)+2] + " ");
             }
             System.out.println();
         }
     }
 
-    public static PontoRGB[][] colocarPontoFixo(PontoRGB[][] m, ArrayList<String> pontos){
+    public static int[][] colocarPontoFixo(int[][] m, ArrayList<String> pontos){
         int x = 0;
         int y = 0;
         int r = 0;
@@ -243,29 +243,44 @@ public class DataServer {
             g = Integer.parseInt(p.split(" ")[3]);
             b = Integer.parseInt(p.split(" ")[4]);
 
-            m[x][y] = new PontoRGB(r, g, b);
+            m[x][(3*y)] = r;
+            m[x][(3*y)+1] = g;
+            m[x][(3*y)+2] = b;
         }
 
         return m;
     }
 
-    public static PontoRGB[][] juntarMatrizes(ArrayList<PontoRGB[][]> partes_matriz){
-        PontoRGB r[][]= new PontoRGB[n_matriz][n_matriz];
+    public static int[][] juntarMatrizes(ArrayList<int[][]> partes_matriz){
+        int r[][]= new int[n_matriz][n_matriz*3];
 
         int linha_r = 1;
         int coluna_r = 1;
 
         for(int i=0; i<n_matriz; i++){
-            r[i][0] = new PontoRGB(127, 127, 127);
-            r[i][n_matriz-1] = new PontoRGB(127, 127, 127);
-            r[0][i] = new PontoRGB(127, 127, 127);
-            r[n_matriz-1][i] = new PontoRGB(127, 127, 127);
+            r[i][0] = 127;
+            r[i][0+1] = 127;
+            r[i][0+2] = 127;
+
+            r[i][(3*(n_matriz-1))] = 127;
+            r[i][(3*(n_matriz-1))+1] = 127;
+            r[i][(3*(n_matriz-1))+2] = 127;
+
+            r[0][(3*i)] = 127;
+            r[0][(3*i)+1] = 127;
+            r[0][(3*i)+2] = 127;
+
+            r[n_matriz-1][(3*i)] = 127;
+            r[n_matriz-1][(3*i)+1] = 127;
+            r[n_matriz-1][(3*i)+2] = 127;
         }
 
-        for(PontoRGB[][] p : partes_matriz){
+        for(int[][] p : partes_matriz){
             for(int i=0; i<p.length; i++){
-                for(int j=0; j<p[0].length; j++){
-                    r[linha_r][coluna_r] = new PontoRGB(p[i][j].getValorR(), p[i][j].getValorG(), p[i][j].getValorB());
+                for(int j=0; j<p[0].length/3; j++){
+                    r[linha_r][(3*coluna_r)] = p[i][(3*j)];
+                    r[linha_r][(3*coluna_r)+1] = p[i][(3*j)+1];
+                    r[linha_r][(3*coluna_r)+2] = p[i][(3*j)+2];
                     coluna_r++;
                 }
                 coluna_r = 1;

@@ -8,44 +8,52 @@ import java.util.Scanner;
 
 public class TestarSpencil {
 
-    public static PontoRGB[][] calcularMatriz(PontoRGB[][] m) {
-        int colunas = m[0].length;
+    public static int[][] calcularMatriz(int[][] m) {
         int linhas = m.length;
-        PontoRGB r[][] = new PontoRGB[linhas][colunas];
+        int colunas = m[0].length;
+        int m_r[][] = new int[linhas][colunas];
         for (int i = 0; i < linhas; i++) {
-            for (int j = 0; j < colunas; j++) {
-                if ((i - 1 >= 0) && (i + 1 < linhas) && (j - 1 >= 0) && (j + 1 < colunas)) {
-                    int R = (m[i][j].getValorR() + m[i - 1][j].getValorR() + m[i + 1][j].getValorR()
-                            + m[i][j - 1].getValorR() + m[i][j + 1].getValorR()) / 5;
-                    int G = (m[i][j].getValorG() + m[i - 1][j].getValorG() + m[i + 1][j].getValorG()
-                            + m[i][j - 1].getValorG() + m[i][j + 1].getValorG()) / 5;
-                    int B = (m[i][j].getValorB() + m[i - 1][j].getValorB() + m[i + 1][j].getValorB()
-                            + m[i][j - 1].getValorB() + m[i][j + 1].getValorB()) / 5;
-                    r[i][j] = new PontoRGB(R, G, B);
+            for (int j = 0; j < linhas; j++) {
+                if ((i - 1 >= 0) && (i + 1 < linhas) && ((3 * (j - 1)) >= 0) && ((3 * (j + 1)) < colunas)) {
+                    int r = (m[i][(3 * j)] + m[i - 1][(3 * j)] + m[i + 1][(3 * j)]
+                            + m[i][(3 * (j - 1))] + m[i][(3 * (j + 1))]) / 5;
+                    int g = (m[i][(3 * j) + 1] + m[i - 1][(3 * j) + 1] + m[i + 1][(3 * j) + 1]
+                            + m[i][(3 * (j - 1)) + 1] + m[i][(3 * (j + 1)) + 1]) / 5;
+                    int b = (m[i][(3 * j) + 2] + m[i - 1][(3 * j) + 2] + m[i + 1][(3 * j) + 2]
+                            + m[i][(3 * (j - 1)) + 2] + m[i][(3 * (j + 1)) + 2]) / 5;
+
+                    m_r[i][(3 * j)] = r;
+                    m_r[i][(3 * j) + 1] = g;
+                    m_r[i][(3 * j) + 2] = b;
+                
                 } else {
-                    r[i][j] = new PontoRGB(m[i][j].getValorR(), m[i][j].getValorG(), m[i][j].getValorB());
+                    m_r[i][(3 * j)] = m[i][(3 * j)];
+                    m_r[i][(3 * j) + 1] = m[i][(3 * j) + 1];
+                    m_r[i][(3 * j) + 2] = m[i][(3 * j) + 2];
                 }
             }
         }
 
-        return r;
+        return m_r;
 
     }
 
-    public static PontoRGB[][] colocarPontoFixo(PontoRGB[][] m, ArrayList<String> pontos){
+    public static int[][] colocarPontoFixo(int[][] m, ArrayList<String> pontos) {
         int x = 0;
         int y = 0;
         int r = 0;
         int b = 0;
         int g = 0;
-        for(String p : pontos){
+        for (String p : pontos) {
             x = Integer.parseInt(p.split(" ")[0]);
             y = Integer.parseInt(p.split(" ")[1]);
             r = Integer.parseInt(p.split(" ")[2]);
             g = Integer.parseInt(p.split(" ")[3]);
             b = Integer.parseInt(p.split(" ")[4]);
 
-            m[x][y] = new PontoRGB(r, g, b);
+            m[x][(3 * y)] = r;
+            m[x][(3 * y) + 1] = g;
+            m[x][(3 * y) + 2] = b;
         }
 
         return m;
@@ -55,7 +63,7 @@ public class TestarSpencil {
 
         // Scanner in = new Scanner(new FileReader("dados.txt"));
         Scanner in = new Scanner(new FileReader("img01.dat"));
-        int n_iteracoes = 1;
+        int n_iteracoes = 10000;
         int n_matriz = 0;
         int n_ponto_fixos = 0;
         int qtd = 0;
@@ -63,11 +71,11 @@ public class TestarSpencil {
         while (in.hasNextLine()) {
             String linha = in.nextLine();
 
-            if(qtd == 0){
+            if (qtd == 0) {
                 n_matriz = Integer.parseInt(linha.split(" ")[0]) + 2;
                 n_ponto_fixos = Integer.parseInt(linha.split(" ")[1]);
-            }else{
-                if(qtd-1 != n_ponto_fixos){
+            } else {
+                if (qtd - 1 != n_ponto_fixos) {
                     pontos.add(linha);
                 }
             }
@@ -76,13 +84,17 @@ public class TestarSpencil {
         }
 
         // Criando a matriz
-        PontoRGB m[][] = new PontoRGB[n_matriz][n_matriz];
+        int m[][] = new int[n_matriz][n_matriz * 3];
         for (int i = 0; i < m.length; i++) {
-            for (int j = 0; j < m[0].length; j++) {
-                if ((i - 1 >= 0) && (i + 1 < m.length) && (j - 1 >= 0) && (j + 1 < m[0].length)) {
-                    m[i][j] = new PontoRGB(0, 0, 0);
+            for (int j = 0; j < n_matriz; j++) {
+                if ((i - 1 >= 0) && (i + 1 < m.length) && ((3 * (j - 1)) >= 0) && ((3 * (j + 1)) < m[0].length)) {
+                    m[i][(3 * j)] = 0;
+                    m[i][(3 * j) + 1] = 0;
+                    m[i][(3 * j) + 2] = 0;
                 } else {
-                    m[i][j] = new PontoRGB(127, 127, 127);
+                    m[i][(3 * j)] = 127;
+                    m[i][(3 * j) + 1] = 127;
+                    m[i][(3 * j) + 2] = 127;
                 }
             }
         }
@@ -90,7 +102,7 @@ public class TestarSpencil {
         long tempoInicial = System.currentTimeMillis();
 
         // Fazendo as iterações
-        for(int i=0; i<n_iteracoes; i++){
+        for (int i = 0; i < n_iteracoes; i++) {
             m = colocarPontoFixo(m, pontos);
             m = calcularMatriz(m);
         }
@@ -101,7 +113,7 @@ public class TestarSpencil {
         long tempoExecucao = tempoFinal - tempoInicial;
 
         System.out.println("O método foi executado em " + (tempoExecucao) + " milisegundos");
-        System.out.println("O método foi executado em " + (tempoExecucao/1000) + " segundos");
+        System.out.println("O método foi executado em " + (tempoExecucao / 1000) + " segundos");
 
         File arquivo = new File("saidaNossa.dat");
 
@@ -119,20 +131,21 @@ public class TestarSpencil {
 
         // // Colocando a matriz no arquivo considerando as bordas
         // for (int i = 0; i < m.length; i++) {
-        //     for (int j = 0; j < m[0].length; j++) {
-        //         bw.write("< " + m[i][j].getValorR() + ", " + m[i][j].getValorG() + ", " + m[i][j].getValorB() + " >");
-        //         if (j != m[0].length - 1) {
-        //             bw.write(" ");
-        //         }
-        //     }
-        //     bw.newLine();
+        // for (int j = 0; j < m[0].length; j++) {
+        // bw.write("< " + m[i][j].getValorR() + ", " + m[i][j].getValorG() + ", " +
+        // m[i][j].getValorB() + " >");
+        // if (j != m[0].length - 1) {
+        // bw.write(" ");
+        // }
+        // }
+        // bw.newLine();
         // }
 
         // Colocando a matriz no arquivo não considerando as bordas
-        for (int i = 1; i < m.length-1; i++) {
-            for (int j = 1; j < m[0].length-1; j++) {
-                bw.write("< " + m[i][j].getValorR() + ", " + m[i][j].getValorG() + ", " + m[i][j].getValorB() + " >");
-                if (j != m[0].length - 1) {
+        for (int i = 1; i < m.length - 1; i++) {
+            for (int j = 1; j < m.length - 1; j++) {
+                bw.write("< " + m[i][(3 * j)] + ", " + m[i][(3 * j) + 1] + ", " + m[i][(3 * j) + 2] + " >");
+                if (j != m.length - 1) {
                     bw.write(" ");
                 }
             }
