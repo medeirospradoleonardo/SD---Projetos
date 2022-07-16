@@ -18,7 +18,7 @@ public class TestarArquivos {
         int n = 256;
 
         Scanner in1 = new Scanner(new FileReader("final.dat"));
-        Scanner in2 = new Scanner(new FileReader("final.dat"));
+        Scanner in2 = new Scanner(new FileReader("saidaNossa.dat"));
 
         ArrayList<PontoRGB> pontos_arq1 = new ArrayList<>();
         ArrayList<PontoRGB> pontos_arq2 = new ArrayList<>();
