@@ -16,8 +16,8 @@ import java.util.concurrent.Executors;
 public class Servidor {
 
     private static int PORT = 9090;
-    private static int n_clients = 2;
-    private static int n_iteracoes = 100;
+    private static int n_clients = 4;
+    private static int n_iteracoes = 1000;
     private static int n_matriz = 256;
     private static int[][] m;
     private static ArrayList<String> pontos = new ArrayList<>();
@@ -86,11 +86,10 @@ public class Servidor {
         }
 
         Collections.reverse(clients);
+        tempoInicial = System.currentTimeMillis();
         for (ClientHandler c : clients) {
             pool.execute(c);
         }
-        // pool.execute((Runnable) clients);
-        tempoInicial = System.currentTimeMillis();
         System.out.println("Iniciando cálculos...");
 
         while (getCiclosTotal() != n_clients * n_iteracoes) {
@@ -117,7 +116,7 @@ public class Servidor {
 
         listener.close();
 
-        File arquivo = new File("final.dat");
+        File arquivo = new File("saidaSocket.dat");
 
         // cria um arquivo (vazio)
         arquivo.createNewFile();
@@ -306,13 +305,11 @@ public class Servidor {
                 System.err.println("IO exception");
                 System.err.println(e.getStackTrace());
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } finally {
                 try {
                     out.close();
                 } catch (IOException e1) {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
                 try {

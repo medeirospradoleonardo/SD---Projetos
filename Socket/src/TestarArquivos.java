@@ -17,8 +17,8 @@ public class TestarArquivos {
     public static void main(String[] args) throws FileNotFoundException {
         int n = 256;
 
-        Scanner in1 = new Scanner(new FileReader("final.dat"));
-        Scanner in2 = new Scanner(new FileReader("saidaNossa.dat"));
+        Scanner in1 = new Scanner(new FileReader("saidaSequencial.dat"));
+        Scanner in2 = new Scanner(new FileReader("saidaSocket.dat"));
 
         ArrayList<PontoRGB> pontos_arq1 = new ArrayList<>();
         ArrayList<PontoRGB> pontos_arq2 = new ArrayList<>();

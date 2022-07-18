@@ -6,64 +6,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class TestarSpencil {
-
-    public static int[][] calcularMatriz(int[][] m) {
-        int linhas = m.length;
-        int colunas = m[0].length;
-        int m_r[][] = new int[linhas][colunas];
-        for (int i = 0; i < linhas; i++) {
-            for (int j = 0; j < linhas; j++) {
-                if ((i - 1 >= 0) && (i + 1 < linhas) && ((3 * (j - 1)) >= 0) && ((3 * (j + 1)) < colunas)) {
-                    int r = (m[i][(3 * j)] + m[i - 1][(3 * j)] + m[i + 1][(3 * j)]
-                            + m[i][(3 * (j - 1))] + m[i][(3 * (j + 1))]) / 5;
-                    int g = (m[i][(3 * j) + 1] + m[i - 1][(3 * j) + 1] + m[i + 1][(3 * j) + 1]
-                            + m[i][(3 * (j - 1)) + 1] + m[i][(3 * (j + 1)) + 1]) / 5;
-                    int b = (m[i][(3 * j) + 2] + m[i - 1][(3 * j) + 2] + m[i + 1][(3 * j) + 2]
-                            + m[i][(3 * (j - 1)) + 2] + m[i][(3 * (j + 1)) + 2]) / 5;
-
-                    m_r[i][(3 * j)] = r;
-                    m_r[i][(3 * j) + 1] = g;
-                    m_r[i][(3 * j) + 2] = b;
-                
-                } else {
-                    m_r[i][(3 * j)] = m[i][(3 * j)];
-                    m_r[i][(3 * j) + 1] = m[i][(3 * j) + 1];
-                    m_r[i][(3 * j) + 2] = m[i][(3 * j) + 2];
-                }
-            }
-        }
-
-        return m_r;
-
-    }
-
-    public static int[][] colocarPontoFixo(int[][] m, ArrayList<String> pontos) {
-        int x = 0;
-        int y = 0;
-        int r = 0;
-        int b = 0;
-        int g = 0;
-        for (String p : pontos) {
-            x = Integer.parseInt(p.split(" ")[0]);
-            y = Integer.parseInt(p.split(" ")[1]);
-            r = Integer.parseInt(p.split(" ")[2]);
-            g = Integer.parseInt(p.split(" ")[3]);
-            b = Integer.parseInt(p.split(" ")[4]);
-
-            m[x][(3 * y)] = r;
-            m[x][(3 * y) + 1] = g;
-            m[x][(3 * y) + 2] = b;
-        }
-
-        return m;
-    }
+public class Squencial {
 
     public static void main(String[] args) throws IOException {
 
-        // Scanner in = new Scanner(new FileReader("dados.txt"));
         Scanner in = new Scanner(new FileReader("img01.dat"));
-        int n_iteracoes = 1000;
+        int n_iteracoes = 10;
         int n_matriz = 0;
         int n_ponto_fixos = 0;
         int qtd = 0;
@@ -115,7 +63,7 @@ public class TestarSpencil {
         System.out.println("O método foi executado em " + (tempoExecucao) + " milisegundos");
         System.out.println("O método foi executado em " + (tempoExecucao / 1000) + " segundos");
 
-        File arquivo = new File("saidaNossa.dat");
+        File arquivo = new File("saidaSequencial.dat");
 
         // cria um arquivo (vazio)
         arquivo.createNewFile();
@@ -128,18 +76,6 @@ public class TestarSpencil {
 
         // construtor recebe como argumento o objeto do tipo FileWriter
         BufferedWriter bw = new BufferedWriter(fw);
-
-        // // Colocando a matriz no arquivo considerando as bordas
-        // for (int i = 0; i < m.length; i++) {
-        // for (int j = 0; j < m[0].length; j++) {
-        // bw.write("< " + m[i][j].getValorR() + ", " + m[i][j].getValorG() + ", " +
-        // m[i][j].getValorB() + " >");
-        // if (j != m[0].length - 1) {
-        // bw.write(" ");
-        // }
-        // }
-        // bw.newLine();
-        // }
 
         // Colocando a matriz no arquivo não considerando as bordas
         for (int i = 1; i < m.length - 1; i++) {
@@ -156,5 +92,56 @@ public class TestarSpencil {
         bw.close();
         fw.close();
 
+    }
+
+    public static int[][] calcularMatriz(int[][] m) {
+        int linhas = m.length;
+        int colunas = m[0].length;
+        int m_r[][] = new int[linhas][colunas];
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < linhas; j++) {
+                if ((i - 1 >= 0) && (i + 1 < linhas) && ((3 * (j - 1)) >= 0) && ((3 * (j + 1)) < colunas)) {
+                    int r = (m[i][(3 * j)] + m[i - 1][(3 * j)] + m[i + 1][(3 * j)]
+                            + m[i][(3 * (j - 1))] + m[i][(3 * (j + 1))]) / 5;
+                    int g = (m[i][(3 * j) + 1] + m[i - 1][(3 * j) + 1] + m[i + 1][(3 * j) + 1]
+                            + m[i][(3 * (j - 1)) + 1] + m[i][(3 * (j + 1)) + 1]) / 5;
+                    int b = (m[i][(3 * j) + 2] + m[i - 1][(3 * j) + 2] + m[i + 1][(3 * j) + 2]
+                            + m[i][(3 * (j - 1)) + 2] + m[i][(3 * (j + 1)) + 2]) / 5;
+
+                    m_r[i][(3 * j)] = r;
+                    m_r[i][(3 * j) + 1] = g;
+                    m_r[i][(3 * j) + 2] = b;
+                
+                } else {
+                    m_r[i][(3 * j)] = m[i][(3 * j)];
+                    m_r[i][(3 * j) + 1] = m[i][(3 * j) + 1];
+                    m_r[i][(3 * j) + 2] = m[i][(3 * j) + 2];
+                }
+            }
+        }
+
+        return m_r;
+
+    }
+
+    public static int[][] colocarPontoFixo(int[][] m, ArrayList<String> pontos) {
+        int x = 0;
+        int y = 0;
+        int r = 0;
+        int b = 0;
+        int g = 0;
+        for (String p : pontos) {
+            x = Integer.parseInt(p.split(" ")[0]);
+            y = Integer.parseInt(p.split(" ")[1]);
+            r = Integer.parseInt(p.split(" ")[2]);
+            g = Integer.parseInt(p.split(" ")[3]);
+            b = Integer.parseInt(p.split(" ")[4]);
+
+            m[x][(3 * y)] = r;
+            m[x][(3 * y) + 1] = g;
+            m[x][(3 * y) + 2] = b;
+        }
+
+        return m;
     }
 }
