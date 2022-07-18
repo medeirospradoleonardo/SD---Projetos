@@ -63,7 +63,7 @@ public class TestarSpencil {
 
         // Scanner in = new Scanner(new FileReader("dados.txt"));
         Scanner in = new Scanner(new FileReader("img01.dat"));
-        int n_iteracoes = 10000;
+        int n_iteracoes = 1000;
         int n_matriz = 0;
         int n_ponto_fixos = 0;
         int qtd = 0;

@@ -1,56 +1,30 @@
-import java.io.BufferedReader;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
-public class Client {
+public class Cliente {
 
-    private static final String SERVER_IP = "127.0.0.1";
-    private static final int SERVER_PORT = 9090;
+    private static String SERVER_IP = "127.0.0.1";
+    private static int SERVER_PORT = 9090;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
         Socket socket = new Socket(SERVER_IP, SERVER_PORT);
-
-        // BufferedReader input = new BufferedReader(new
-        // InputStreamReader(socket.getInputStream()));
-        BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
         ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
         ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 
-        // while(true){
-        // System.out.println("> ");
-        // String command = keyboard.readLine();
-
-        // if(command.equals("quit")) break;
-
-        // out.println(command);
-
-        // String serverResponse = input.readLine();
-        // String serverResponse2 = input.readLine();
-        // System.out.println("Server says: " + serverResponse);
-        // System.out.println("Server says: " + serverResponse2);
-        // }
-
         while (true) {
-            int[][] matriz = (int[][]) input.readObject();
 
-            // int serverResponse = matriz[0][1].getValorR();
-            // System.out.println(serverResponse);
-
-            output.writeObject(calcularMatriz(matriz));
+            output.writeObject(calcularMatriz((int[][]) input.readObject()));
             output.flush();
             output.reset();
 
         }
-
-        // socket.close();
-        // System.exit(0);
     }
+
 
     public static int[][] calcularMatriz(int[][] m) {
         int linhas = m.length;

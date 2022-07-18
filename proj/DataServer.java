@@ -81,6 +81,7 @@ public class DataServer {
         // ObjectInputStream input = new ObjectInputStream(clientThread.getClient().getInputStream());
 
         long tempoInicial = System.currentTimeMillis();
+        int[][] teste;
 
         for (int i = 0; i < n_iteracoes; i++) {
             m = colocarPontoFixo(m, pontos);
@@ -95,6 +96,7 @@ public class DataServer {
                 // ObjectOutputStream output = new ObjectOutputStream(client.getClient().getOutputStream());
                 outputs.get(j).writeObject(getParteMatriz(client, m));
                 outputs.get(j).flush();
+                outputs.get(j).reset();
 
                 // ObjectInputStream input = new ObjectInputStream(client.getClient().getInputStream());
                 // PontoRGB[][] teste = (PontoRGB[][]) input.readObject();
@@ -114,8 +116,16 @@ public class DataServer {
                 // ObjectInputStream input = new ObjectInputStream(client.getClient().getInputStream());
 
 
-                int[][] teste = (int[][]) inputs.get(j).readObject();
-                partes_matriz.add(teste);
+                teste = (int[][]) inputs.get(j).readObject();
+                if(i != 0){
+                    for (int x = 0; x < partes_matriz.get(j).length; x++) {
+                        for (int y = 0; y < partes_matriz.get(j)[0].length; y++) {
+                            partes_matriz.get(j)[x][y] = teste[x][y];
+                        }
+                    }
+                }else{
+                    partes_matriz.add(teste);
+                }
 
             }
 
@@ -126,7 +136,7 @@ public class DataServer {
 
             m = juntarMatrizes(partes_matriz);
 
-            partes_matriz.clear();
+            // partes_matriz.clear();
 
 
         }
