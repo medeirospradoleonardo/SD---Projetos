@@ -17,6 +17,7 @@ public class Cliente {
         ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 
         while (true) {
+            // Recebe a parte da matriz para calcular e retorna a matriz resultante para o servidor
             output.writeObject(calcularMatriz((int[][]) input.readObject()));
             output.flush();
             output.reset();
@@ -24,6 +25,7 @@ public class Cliente {
     }
 
 
+    // Função para fazer o cálculo da parte vinda do servidor utilizando estêncil
     public static int[][] calcularMatriz(int[][] m) {
         int linhas = m.length;
         int colunas = m[0].length;

@@ -11,11 +11,16 @@ public class Squencial {
     public static void main(String[] args) throws IOException {
 
         Scanner in = new Scanner(new FileReader("img01.dat"));
-        int n_iteracoes = 10;
+
+        // Parâmetro para testes
+        int n_iteracoes = 10000;
+
         int n_matriz = 0;
         int n_ponto_fixos = 0;
         int qtd = 0;
         ArrayList<String> pontos = new ArrayList<>();
+
+        // Lendo o arquivo
         while (in.hasNextLine()) {
             String linha = in.nextLine();
 
@@ -47,6 +52,7 @@ public class Squencial {
             }
         }
 
+        // Iniciando o cálculo do tempo
         long tempoInicial = System.currentTimeMillis();
 
         // Fazendo as iterações
@@ -57,6 +63,7 @@ public class Squencial {
 
         m = colocarPontoFixo(m, pontos);
 
+        // Finalizando o cálculo do tempo
         long tempoFinal = System.currentTimeMillis();
         long tempoExecucao = tempoFinal - tempoInicial;
 
@@ -65,16 +72,16 @@ public class Squencial {
 
         File arquivo = new File("saidaSequencial.dat");
 
-        // cria um arquivo (vazio)
+        // Cria um arquivo (vazio)
         arquivo.createNewFile();
-        // cria um diretório
+        // Cria um diretório
         arquivo.mkdir();
 
-        // construtor que recebe o objeto do tipo arquivo
+        // Construtor que recebe o objeto do tipo arquivo
         FileWriter fw = new FileWriter(arquivo);
-        // construtor que recebe também como argumento se o conteúdo será acrescentado
+        // Construtor que recebe também como argumento se o conteúdo será acrescentado
 
-        // construtor recebe como argumento o objeto do tipo FileWriter
+        // Construtor recebe como argumento o objeto do tipo FileWriter
         BufferedWriter bw = new BufferedWriter(fw);
 
         // Colocando a matriz no arquivo não considerando as bordas
@@ -88,12 +95,13 @@ public class Squencial {
             bw.newLine();
         }
 
-        // fecha os recursos
+        // Fecha os recursos
         bw.close();
         fw.close();
 
     }
 
+    // Função para fazer o cálculo utilizando estêncil
     public static int[][] calcularMatriz(int[][] m) {
         int linhas = m.length;
         int colunas = m[0].length;
@@ -124,6 +132,7 @@ public class Squencial {
 
     }
 
+    // Função para colocar os pontos fixos na matriz
     public static int[][] colocarPontoFixo(int[][] m, ArrayList<String> pontos) {
         int x = 0;
         int y = 0;

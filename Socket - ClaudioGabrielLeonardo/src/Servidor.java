@@ -15,10 +15,14 @@ import java.util.concurrent.Executors;
 
 public class Servidor {
 
+    // Parâmetros para testes
     private static int PORT = 9090;
-    private static int n_clients = 4;
-    private static int n_iteracoes = 1000;
-    private static int n_matriz = 256;
+    private static int n_clients = 2;
+    private static int n_iteracoes = 10000;
+
+
+
+    private static int n_matriz;
     private static int[][] m;
     private static ArrayList<String> pontos = new ArrayList<>();
     private static ArrayList<ClientHandler> clients = new ArrayList<>();
@@ -34,6 +38,8 @@ public class Servidor {
         n_matriz = 0;
         int n_ponto_fixos = 0;
         int qtd = 0;
+
+        // Lendo o arquivo
         while (in.hasNextLine()) {
             String linha = in.nextLine();
 
@@ -65,6 +71,7 @@ public class Servidor {
             }
         }
 
+        // Colocando os pontos fixos na matriz inicial
         colocarPontoFixo();
 
         for (int i = 0; i < n_clients; i++) {
@@ -75,6 +82,7 @@ public class Servidor {
         ExecutorService pool = Executors.newFixedThreadPool(n_clients);
         listener = new ServerSocket(PORT);
 
+        // Fazendo a conexão com os clientes
         for (int i = 0; i < n_clients; i++) {
             System.out.println("Esperando Cliente " + (i + 1));
             Socket client = listener.accept();
@@ -86,13 +94,19 @@ public class Servidor {
         }
 
         Collections.reverse(clients);
+
+        // Iniciando a contagem de tempo
         tempoInicial = System.currentTimeMillis();
+
         for (ClientHandler c : clients) {
             pool.execute(c);
         }
         System.out.println("Iniciando cálculos...");
 
+        // Looping até se acabar as iterações
         while (getCiclosTotal() != n_clients * n_iteracoes) {
+
+            // Identificando se todas as partes já vieram, se sim, é feita a junção e o processo é refeito
             if (getPartes()) {
                 juntarMatrizes();
                 colocarPontoFixo();
@@ -116,18 +130,19 @@ public class Servidor {
 
         listener.close();
 
+        // Salva a matriz final no arquivo
         File arquivo = new File("saidaSocket.dat");
 
-        // cria um arquivo (vazio)
+        // Cria um arquivo (vazio)
         arquivo.createNewFile();
-        // cria um diretório
+        // Cria um diretório
         arquivo.mkdir();
 
-        // construtor que recebe o objeto do tipo arquivo
+        // Construtor que recebe o objeto do tipo arquivo
         FileWriter fw = new FileWriter(arquivo);
-        // construtor que recebe também como argumento se o conteúdo será acrescentado
+        // Construtor que recebe também como argumento se o conteúdo será acrescentado
 
-        // construtor recebe como argumento o objeto do tipo FileWriter
+        // Construtor recebe como argumento o objeto do tipo FileWriter
         BufferedWriter bw = new BufferedWriter(fw);
 
         // Colocando a matriz no arquivo não considerando as bordas
@@ -141,7 +156,7 @@ public class Servidor {
             bw.newLine();
         }
 
-        // fecha os recursos
+        // Fecha os recursos
         bw.close();
         fw.close();
 
@@ -149,6 +164,7 @@ public class Servidor {
 
     }
 
+    // Função para pegar o id (posição) de um cliente específico
     public static int getIndexClient(ClientHandler c) {
         for (int i = 0; i < clients.size(); i++) {
             if (clients.get(i).equals(c)) {
@@ -159,6 +175,7 @@ public class Servidor {
         return -1;
     }
 
+    // Função para ver o intervalo da matriz de um determinado cliente
     public static ArrayList<Integer> getIntervalos(ClientHandler c) {
         ArrayList<Integer> intervalos = new ArrayList<>();
         int pos = getIndexClient(c);
@@ -169,6 +186,7 @@ public class Servidor {
         return intervalos;
     }
 
+    // Função para obter a parte da matriz relativa a um determinado cliente
     public static int[][] getParteMatriz(ClientHandler c) {
         ArrayList<Integer> intervalos = getIntervalos(c);
         int n_linhas = Math.abs(intervalos.get(0) - intervalos.get(1)) + 1;
@@ -187,6 +205,7 @@ public class Servidor {
         return p_m;
     }
 
+    // Função para colocar a parte da matriz gerada do cliente no arraylist das matrizes geradas
     public static void setParteMatriz(ClientHandler c, int[][] p) throws IOException {
         int index_client = getIndexClient(c);
 
@@ -196,6 +215,7 @@ public class Servidor {
 
     }
 
+    // Função para colocar os pontos fixos na matriz principal
     public static void colocarPontoFixo() {
         int x = 0;
         int y = 0;
@@ -215,6 +235,7 @@ public class Servidor {
         }
     }
 
+    // Função que vê se todas as partes ja foram calculadas
     public static boolean getPartes() {
         for (Boolean p : partesBoolean) {
             if (!p) {
@@ -225,11 +246,13 @@ public class Servidor {
         return true;
     }
 
+    // Função para ver se a parte de um determinado cliente ja foi calculada
     public static boolean getParteBoolean(ClientHandler c){
         int index_client = getIndexClient(c);
         return partesBoolean.get(index_client);
     }
 
+    // Função para ver o total de ciclos (junta cada ciclo feito de cada cliente)
     public static int getCiclosTotal() {
         int total = 0;
         for (ClientHandler c : clients) {
@@ -239,8 +262,8 @@ public class Servidor {
         return total;
     }
 
+    // Função para pegar todas as partes geradas e criar a matriz principal
     public static void juntarMatrizes() {
-        // int r[][]= new int[n_matriz][n_matriz*3];
 
         int linha_r = 1;
         int coluna_r = 1;
@@ -277,6 +300,7 @@ public class Servidor {
         }
     }
 
+    // Classe para fazer a comunicação entre cliente e servidor
     public static class ClientHandler implements Runnable {
 
         private Socket client;
